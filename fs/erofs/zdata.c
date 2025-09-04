@@ -8,6 +8,7 @@
 #include <linux/prefetch.h>
 #include <linux/overflow.h>
 #include <linux/cpuhotplug.h>
+#include <linux/pagemap.h>   
 #include <trace/events/erofs.h>
 
 /*
