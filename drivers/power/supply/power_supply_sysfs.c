@@ -44,10 +44,9 @@ static const char * const power_supply_type_text[] = {
 	"Unknown", "Battery", "UPS", "Mains", "USB",
 	"USB_DCP", "USB_CDP", "USB_ACA", "USB_C",
 	"USB_PD", "USB_PD_DRP", "BrickID",
-	"USB_HVDCP", "USB_HVDCP_3", "USB_HVDCP_3P5", "Wireless", "USB_FLOAT",
+	"USB_HVDCP", "USB_HVDCP_3", "Wireless", "USB_FLOAT",
 	"BMS", "Parallel", "Main", "Wipower", "USB_C_UFP", "USB_C_DFP",
-	"Charge_Pump",
-	"ZIMI_CAR_POWER", "Batt_Verify"
+	"Charge_Pump","ZIMI_CAR_POWER"
 };
 
 static const char * const power_supply_status_text[] = {
@@ -61,7 +60,8 @@ static const char * const power_supply_charge_type_text[] = {
 static const char * const power_supply_health_text[] = {
 	"Unknown", "Good", "Overheat", "Dead", "Over voltage",
 	"Unspecified failure", "Cold", "Watchdog timer expire",
-	"Safety timer expire", "Over current", "Warm", "Cool", "Hot"
+	"Safety timer expire",
+	"Warm", "Cool", "Hot"
 };
 
 static const char * const power_supply_technology_text[] = {
@@ -109,12 +109,10 @@ static ssize_t power_supply_show_property(struct device *dev,
 
 		if (ret < 0) {
 			if (ret == -ENODATA)
-				dev_dbg_ratelimited(dev,
-					"driver has no data for `%s' property\n",
+				dev_dbg(dev, "driver has no data for `%s' property\n",
 					attr->attr.name);
 			else if (ret != -ENODEV && ret != -EAGAIN)
-				dev_err_ratelimited(dev,
-					"driver failed to report `%s' property: %zd\n",
+				dev_err(dev, "driver failed to report `%s' property: %zd\n",
 					attr->attr.name, ret);
 			return ret;
 		}
@@ -157,27 +155,8 @@ static ssize_t power_supply_show_property(struct device *dev,
 	else if (off == POWER_SUPPLY_PROP_CONNECTOR_HEALTH)
 		return scnprintf(buf, PAGE_SIZE, "%s\n",
 			       power_supply_health_text[value.intval]);
-	else if (off == POWER_SUPPLY_PROP_SKIN_HEALTH)
-		return scnprintf(buf, PAGE_SIZE, "%s\n",
-			       power_supply_health_text[value.intval]);
 	else if (off >= POWER_SUPPLY_PROP_MODEL_NAME)
 		return sprintf(buf, "%s\n", value.strval);
-#if (defined CONFIG_BATT_VERIFY_BY_DS28E16 || defined CONFIG_BATT_VERIFY_BY_DS28E16_NABU)
-	else if ((off == POWER_SUPPLY_PROP_ROMID) || (off == POWER_SUPPLY_PROP_DS_STATUS))
-		return scnprintf(buf, PAGE_SIZE, "%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x\n",
-			value.arrayval[0], value.arrayval[1], value.arrayval[2], value.arrayval[3],
-			value.arrayval[4], value.arrayval[5], value.arrayval[6], value.arrayval[7]);
-	else if ((off == POWER_SUPPLY_PROP_PAGE0_DATA) ||
-			(off == POWER_SUPPLY_PROP_PAGE1_DATA) ||
-			(off == POWER_SUPPLY_PROP_PAGEDATA))
-		return scnprintf(buf, PAGE_SIZE, "%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x\n",
-			value.arrayval[0], value.arrayval[1], value.arrayval[2], value.arrayval[3],
-			value.arrayval[4], value.arrayval[5], value.arrayval[6], value.arrayval[7],
-			value.arrayval[8], value.arrayval[9], value.arrayval[10], value.arrayval[11],
-			value.arrayval[12], value.arrayval[13], value.arrayval[14], value.arrayval[15]);
-	else if (off == POWER_SUPPLY_PROP_VERIFY_MODEL_NAME)
-		return sprintf(buf, "%s\n", value.strval);
-#endif
 
 	if (off == POWER_SUPPLY_PROP_CHARGE_COUNTER_EXT)
 		return sprintf(buf, "%lld\n", value.int64val);
@@ -199,18 +178,6 @@ static ssize_t power_supply_show_property(struct device *dev,
 	else if (off == POWER_SUPPLY_PROP_TX_MAC)
 		return scnprintf(buf, PAGE_SIZE, "%llx\n",
 				value.int64val);
-	else if (off == POWER_SUPPLY_PROP_PEN_MAC)
-		return scnprintf(buf, PAGE_SIZE, "%llx\n",
-				value.int64val);
-	else if (off ==  POWER_SUPPLY_PROP_REVERSE_PEN_SOC)
-		return scnprintf(buf, PAGE_SIZE, "%d\n",
-				value.intval);
-	else if (off ==  POWER_SUPPLY_PROP_REVERSE_CHG_STATE)
-		return scnprintf(buf, PAGE_SIZE, "%d\n",
-				value.intval);
-	else if (off == POWER_SUPPLY_PROP_REVERSE_PEN_CHG_STATE)
-		return scnprintf(buf, PAGE_SIZE, "%d\n",
-				value.intval);
 	else if (off == POWER_SUPPLY_PROP_RX_CR)
 		return scnprintf(buf, PAGE_SIZE, "%llx\n",
 				value.int64val);
@@ -268,18 +235,6 @@ static ssize_t power_supply_store_property(struct device *dev,
 		ret = val;
 		break;
 	case POWER_SUPPLY_PROP_TX_MAC:
-		ret = kstrtoll(buf, 16, &num_long);
-		if (ret < 0)
-			return ret;
-		value.int64val = num_long;
-		ret = power_supply_set_property(psy, off, &value);
-		if (ret < 0)
-			return ret;
-		else
-			return count;
-
-		break;
-	case POWER_SUPPLY_PROP_PEN_MAC:
 		ret = kstrtoll(buf, 16, &num_long);
 		if (ret < 0)
 			return ret;
@@ -369,9 +324,6 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(capacity_alert_min),
 	POWER_SUPPLY_ATTR(capacity_alert_max),
 	POWER_SUPPLY_ATTR(capacity_level),
-	POWER_SUPPLY_ATTR(shutdown_delay),
-	POWER_SUPPLY_ATTR(shutdown_delay_en),
-	POWER_SUPPLY_ATTR(raw_capacity),
 	POWER_SUPPLY_ATTR(soc_decimal),
 	POWER_SUPPLY_ATTR(soc_decimal_rate),
 	POWER_SUPPLY_ATTR(cold_thermal_level),
@@ -410,8 +362,6 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(pin_enabled),
 	POWER_SUPPLY_ATTR(input_suspend),
 	POWER_SUPPLY_ATTR(input_voltage_regulation),
-	POWER_SUPPLY_ATTR(input_voltage_vrect),
-	POWER_SUPPLY_ATTR(rx_iout),
 	POWER_SUPPLY_ATTR(input_current_max),
 	POWER_SUPPLY_ATTR(input_current_trim),
 	POWER_SUPPLY_ATTR(input_current_settled),
@@ -461,7 +411,6 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(pd_remove_compensation),
 	POWER_SUPPLY_ATTR(pd_in_hard_reset),
 	POWER_SUPPLY_ATTR(pd_current_max),
-	POWER_SUPPLY_ATTR(apdo_max),
 	POWER_SUPPLY_ATTR(pd_usb_suspend_supported),
 	POWER_SUPPLY_ATTR(charger_temp),
 	POWER_SUPPLY_ATTR(charger_temp_max),
@@ -489,51 +438,24 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(connector_type),
 	POWER_SUPPLY_ATTR(parallel_batfet_mode),
 	POWER_SUPPLY_ATTR(parallel_fcc_max),
+	POWER_SUPPLY_ATTR(parallel_output_mode),
 	POWER_SUPPLY_ATTR(wireless_version),
-	POWER_SUPPLY_ATTR(wireless_fw_version),
 	POWER_SUPPLY_ATTR(signal_strength),
 	POWER_SUPPLY_ATTR(wireless_cp_en),
 	POWER_SUPPLY_ATTR(wireless_power_good_en),
 	POWER_SUPPLY_ATTR(sw_disabel_dc_en),
 	POWER_SUPPLY_ATTR(wireless_wakelock),
-	POWER_SUPPLY_ATTR(wireless_tx_id),
 	POWER_SUPPLY_ATTR(tx_adapter),
 	POWER_SUPPLY_ATTR(tx_mac),
 	POWER_SUPPLY_ATTR(rx_cr),
 	POWER_SUPPLY_ATTR(rx_cep),
 	POWER_SUPPLY_ATTR(bt_state),
-	POWER_SUPPLY_ATTR(pen_mac),
 	POWER_SUPPLY_ATTR(min_icl),
 	POWER_SUPPLY_ATTR(moisture_detected),
 	POWER_SUPPLY_ATTR(batt_profile_version),
 	POWER_SUPPLY_ATTR(batt_full_current),
-	POWER_SUPPLY_ATTR(battery_charging_limited),
-	POWER_SUPPLY_ATTR(slowly_charging),
-	POWER_SUPPLY_ATTR(bq_input_suspend),
 	POWER_SUPPLY_ATTR(recharge_soc),
 	POWER_SUPPLY_ATTR(recharge_vbat),
-	POWER_SUPPLY_ATTR(sys_termination_current),
-	POWER_SUPPLY_ATTR(ffc_sys_termination_current),
-	POWER_SUPPLY_ATTR(vbatt_full_vol),
-	POWER_SUPPLY_ATTR(fcc_vbatt_full_vol),
-	POWER_SUPPLY_ATTR(ki_coeff_current),
-#if (defined CONFIG_BATT_VERIFY_BY_DS28E16 || defined CONFIG_BATT_VERIFY_BY_DS28E16_NABU)
-	/* battery verify properties */
-	POWER_SUPPLY_ATTR(romid),
-	POWER_SUPPLY_ATTR(ds_status),
-	POWER_SUPPLY_ATTR(pagenumber),
-	POWER_SUPPLY_ATTR(pagedata),
-	POWER_SUPPLY_ATTR(authen_result),
-	POWER_SUPPLY_ATTR(session_seed),
-	POWER_SUPPLY_ATTR(s_secret),
-	POWER_SUPPLY_ATTR(challenge),
-	POWER_SUPPLY_ATTR(auth_anon),
-	POWER_SUPPLY_ATTR(auth_bdconst),
-	POWER_SUPPLY_ATTR(page0_data),
-	POWER_SUPPLY_ATTR(page1_data),
-	POWER_SUPPLY_ATTR(verify_model_name),
-	POWER_SUPPLY_ATTR(maxim_batt_cycle_count),
-#endif
 	POWER_SUPPLY_ATTR(hvdcp_opti_allowed),
 	POWER_SUPPLY_ATTR(fastcharge_mode),
 	POWER_SUPPLY_ATTR(smb_en_mode),
@@ -547,28 +469,22 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(toggle_stat),
 	POWER_SUPPLY_ATTR(type_recheck),
 	POWER_SUPPLY_ATTR(liquid_detection),
-	POWER_SUPPLY_ATTR(dynamic_fv_enabled),
 	POWER_SUPPLY_ATTR(main_fcc_max),
 	POWER_SUPPLY_ATTR(fg_reset),
-	POWER_SUPPLY_ATTR(qc_opti_disable),
 	POWER_SUPPLY_ATTR(cc_soc),
-	POWER_SUPPLY_ATTR(batt_age_level),
 	POWER_SUPPLY_ATTR(voltage_vph),
+	POWER_SUPPLY_ATTR(batt_age_level),
 	POWER_SUPPLY_ATTR(chip_version),
-	POWER_SUPPLY_ATTR(chip_ok),
+	POWER_SUPPLY_ATTR(qc_opti_disable),
 	POWER_SUPPLY_ATTR(therm_icl_limit),
-	POWER_SUPPLY_ATTR(dc_reset),
-	POWER_SUPPLY_ATTR(scale_mode_en),
 	POWER_SUPPLY_ATTR(voltage_max_limit),
+	POWER_SUPPLY_ATTR(dc_reset),
 	POWER_SUPPLY_ATTR(real_capacity),
-	POWER_SUPPLY_ATTR(esr_sw_control),
 	POWER_SUPPLY_ATTR(force_main_icl),
 	POWER_SUPPLY_ATTR(force_main_fcc),
 	POWER_SUPPLY_ATTR(comp_clamp_level),
 	POWER_SUPPLY_ATTR(adapter_cc_mode),
-	POWER_SUPPLY_ATTR(skin_health),
-	POWER_SUPPLY_ATTR(apsd_rerun),
-	POWER_SUPPLY_ATTR(apsd_timeout),
+
 	/* Charge pump properties */
 	POWER_SUPPLY_ATTR(cp_status1),
 	POWER_SUPPLY_ATTR(cp_status2),
@@ -595,28 +511,12 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(ti_fault_status),
 	POWER_SUPPLY_ATTR(ti_reg_status),
 	POWER_SUPPLY_ATTR(ti_set_bus_protection_for_qc3),
-	POWER_SUPPLY_ATTR(ti_bus_error_status),
-	POWER_SUPPLY_ATTR(ti_charge_mode),
-	POWER_SUPPLY_ATTR(ti_bypass_mode_enable),
 	POWER_SUPPLY_ATTR(irq_status),
-	POWER_SUPPLY_ATTR(parallel_output_mode),
 	/* DIV 2 properties */
 	POWER_SUPPLY_ATTR(div_2_mode),
 	POWER_SUPPLY_ATTR(reverse_chg_mode),
 	POWER_SUPPLY_ATTR(reverse_chg_state),
-	POWER_SUPPLY_ATTR(reverse_pen_chg_state),
-	POWER_SUPPLY_ATTR(reverse_gpio_state),
 	POWER_SUPPLY_ATTR(reset_div_2_mode),
-	POWER_SUPPLY_ATTR(aicl_enable),
-	POWER_SUPPLY_ATTR(otg_state),
-	POWER_SUPPLY_ATTR(reverse_chg_hall3),
-	POWER_SUPPLY_ATTR(reverse_chg_hall4),
-	POWER_SUPPLY_ATTR(reverse_pen_soc),
-	POWER_SUPPLY_ATTR(reverse_vout),
-	POWER_SUPPLY_ATTR(reverse_iout),
-	POWER_SUPPLY_ATTR(rx_op_ble),
-	POWER_SUPPLY_ATTR(op_ble),
-	
 	/* Local extensions of type int64_t */
 	POWER_SUPPLY_ATTR(charge_counter_ext),
 	/* Properties of type `const char *' */
@@ -701,10 +601,14 @@ int power_supply_uevent(struct device *dev, struct kobj_uevent_env *env)
 	char *prop_buf;
 	char *attrname;
 
+	dev_dbg(dev, "uevent\n");
+
 	if (!psy || !psy->desc) {
 		dev_dbg(dev, "No power supply yet\n");
 		return ret;
 	}
+
+	dev_dbg(dev, "POWER_SUPPLY_NAME=%s\n", psy->desc->name);
 
 	ret = add_uevent_var(env, "POWER_SUPPLY_NAME=%s", psy->desc->name);
 	if (ret)
@@ -740,6 +644,8 @@ int power_supply_uevent(struct device *dev, struct kobj_uevent_env *env)
 			ret = -ENOMEM;
 			goto out;
 		}
+
+		dev_dbg(dev, "prop %s=%s\n", attrname, prop_buf);
 
 		ret = add_uevent_var(env, "POWER_SUPPLY_%s=%s", attrname, prop_buf);
 		kfree(attrname);

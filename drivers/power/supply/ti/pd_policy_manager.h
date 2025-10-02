@@ -67,38 +67,23 @@ enum pm_state {
 
 /* voters for usbpd */
 #define STEP_BMS_CHG_VOTER	"STEP_BMS_CHG_VOTER"
-#define BQ_TAPER_FCC_VOTER	"BQ_TAPER_FCC_VOTER"
 
 /* defined for non_verified pps charger maxium fcc */
-#define NON_VERIFIED_PPS_FCC_MAX		3000
-#define MAX_THERMAL_LEVEL			13
+#define NON_VERIFIED_PPS_FCC_MAX		4800
+#define MAX_THERMAL_LEVEL			15
 /* jeita related */
 #define JEITA_WARM_THR			450
 #define JEITA_COOL_NOT_ALLOW_CP_THR			100
-#define PDO_MAX_NUM			7
 /*
  * add hysteresis for warm threshold to avoid flash
  * charge and normal charge switch frequently at
  * the warm threshold
  */
-#define JEITA_HYSTERESIS			20
-/* product related */
-#define LOW_POWER_PPS_CURR_THR			2000
-#define XIAOMI_LOW_POWER_PPS_CURR_MAX			1500
-#define XIAOMI_LOW_POWER_PPS_CURR_MAX			1500
-#define PPS_VOL_MAX			11000
-#define PPS_VOL_HYS			1000
+#define JEITA_WARM_HYSTERESIS			20
 
-#define STEP_MV			20
-#define TAPER_VOL_HYS			80
-#define TAPER_WITH_IBUS_HYS			60
-#define TAPER_IBUS_THR			450
-#define BQ_TAPER_HYS_MV			10
-#define BQ_TAPER_DECREASE_STEP_MA			200
+
 struct sw_device {
 	bool charge_enabled;
-	bool charge_limited;
-	bool slowly_charging;
 };
 
 struct usbpd_pdo {
@@ -182,6 +167,7 @@ struct usbpd_pm {
 	int	adapter_current;
 	int	adapter_ptf;
 	bool	adapter_omf;
+
 	struct delayed_work pm_work;
 
 	struct notifier_block nb;
@@ -200,16 +186,14 @@ struct usbpd_pm {
 
 	/* dtsi properties */
 	int			bat_volt_max;
-	int			ffc_bat_volt_max;
 	int			bat_curr_max;
 	int			bus_volt_max;
 	int			bus_curr_max;
-	int			bus_curr_compensate;
 	bool		cp_sec_enable;
-	/* jeita or thermal related */
-	bool			jeita_triggered;
-	bool			is_temp_out_fc2_range;
 
+	/* jeita or thermal related */
+	bool			warm_triggered;
+	bool			is_temp_out_fc2_range;
 };
 
 struct pdpm_config {
@@ -217,7 +201,6 @@ struct pdpm_config {
 	int	bat_curr_lp_lmt;
 	int	bus_volt_lp_lmt;
 	int	bus_curr_lp_lmt;
-	int	bus_curr_compensate;
 
 	int	fc2_taper_current;
 	int	fc2_steps;
