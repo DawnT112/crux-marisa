@@ -28,13 +28,14 @@
 #include <linux/mutex.h>
 #include <linux/random.h>
 #include <linux/pm_qos.h>
+#include <linux/usb/hcd.h>
 
 #include <linux/uaccess.h>
 #include <asm/byteorder.h>
 
 #include "hub.h"
 #include "otg_whitelist.h"
-#include "hcd.h"
+
 
 #define USB_VENDOR_GENESYS_LOGIC		0x05e3
 #define HUB_QUIRK_CHECK_PORT_AUTOSUSPEND	0x01
