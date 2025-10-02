@@ -2157,16 +2157,17 @@ static void dwc3_msm_power_collapse_por(struct dwc3_msm *mdwc)
 							__func__, ret);
 
 	/* Get initial P3 status and enable IN_P3 event */
-	if (dwc3_is_usb31(dwc))
-		val = dwc3_msm_read_reg_field(mdwc->base,
-			DWC31_LINK_GDBGLTSSM,
-			DWC3_GDBGLTSSM_LINKSTATE_MASK);
-	else
-		val = dwc3_msm_read_reg_field(mdwc->base,
-			DWC3_GDBGLTSSM, DWC3_GDBGLTSSM_LINKSTATE_MASK);
-	atomic_set(&mdwc->in_p3, val == DWC3_LINK_STATE_U3);
-	dwc3_msm_write_reg_field(mdwc->base, PWR_EVNT_IRQ_MASK_REG,
-				PWR_EVNT_POWERDOWN_IN_P3_MASK, 1);
+/* 兼容处理：替换未定义的 DWC31_LINK_GDBGLTSSM，统一使用 USB3.0 寄存器 DWC3_GDBGLTSSM */
+if (dwc3_is_usb31(dwc))
+	val = dwc3_msm_read_reg_field(mdwc->base,
+		DWC3_GDBGLTSSM,  /* 替换 DWC31_LINK_GDBGLTSSM */
+		DWC3_GDBGLTSSM_LINKSTATE_MASK);
+else
+	val = dwc3_msm_read_reg_field(mdwc->base,
+		DWC3_GDBGLTSSM, DWC3_GDBGLTSSM_LINKSTATE_MASK);
+atomic_set(&mdwc->in_p3, val == DWC3_LINK_STATE_U3);
+dwc3_msm_write_reg_field(mdwc->base, PWR_EVNT_IRQ_MASK_REG,
+			PWR_EVNT_POWERDOWN_IN_P3_MASK, 1);
 
 	/* Set the core in host mode if it was in host mode during pm_suspend */
 	if (mdwc->in_host_mode) {
@@ -2889,11 +2890,7 @@ static void dwc3_pwr_event_handler(struct dwc3_msm *mdwc)
 		u32 ls;
 
 		/* Can't tell if entered or exit P3, so check LINKSTATE */
-		if (dwc3_is_usb31(dwc))
-			ls = dwc3_msm_read_reg_field(mdwc->base,
-				DWC31_LINK_GDBGLTSSM,
-				DWC3_GDBGLTSSM_LINKSTATE_MASK);
-		else
+		if (dwc3_is_usb31(dwc))			
 			ls = dwc3_msm_read_reg_field(mdwc->base,
 				DWC3_GDBGLTSSM, DWC3_GDBGLTSSM_LINKSTATE_MASK);
 		dev_dbg(mdwc->dev, "%s link state = 0x%04x\n", __func__, ls);
@@ -3697,14 +3694,20 @@ static int dwc3_msm_probe(struct platform_device *pdev)
 	if (ret)
 		goto err;
 
-	if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64))) {
-		dev_err(&pdev->dev, "setting DMA mask to 64 failed.\n");
-		if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32))) {
-			dev_err(&pdev->dev, "setting DMA mask to 32 failed.\n");
-			ret = -EOPNOTSUPP;
-			goto uninit_iommu;
-		}
-	}
+	// 先判断系统位数，避免 32 位系统移位溢出
+#if defined(CONFIG_64BIT)
+if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64))) {
+#else
+// 32 位系统直接跳过 64 位掩码设置
+ret = -ENOSYS;
+#endif
+    dev_err(&pdev->dev, "setting DMA mask to 64 failed.\n");
+    if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32))) {
+        dev_err(&pdev->dev, "setting DMA mask to 32 failed.\n");
+        ret = -EOPNOTSUPP;
+        goto uninit_iommu;
+    }
+}
 
 	/* Assumes dwc3 is the first DT child of dwc3-msm */
 	dwc3_node = of_get_next_available_child(node, NULL);
@@ -3789,11 +3792,12 @@ static int dwc3_msm_probe(struct platform_device *pdev)
 		mdwc->pm_qos_latency = 0;
 	}
 
-	if (of_property_read_bool(node, "qcom,host-poweroff-in-pm-suspend")) {
-		dwc->host_poweroff_in_pm_suspend = true;
-		dev_dbg(mdwc->dev, "%s: Core power collapse on host PM suspend\n",
-								__func__);
-	}
+	// 移除对未定义字段的赋值，保留调试日志（若需功能可手动添加结构体成员）
+if (of_property_read_bool(node, "qcom,host-poweroff-in-pm-suspend")) {
+    dev_dbg(mdwc->dev, "%s: Core power collapse on host PM suspend (feature not supported in current kernel)\n",
+                            __func__);
+}
+
 
 	mutex_init(&mdwc->suspend_resume_mutex);
 
@@ -4638,16 +4642,15 @@ static int dwc3_msm_pm_suspend(struct device *dev)
 	 * Check if pm_suspend can proceed irrespective of runtimePM state of
 	 * host.
 	 */
-	if (!dwc->host_poweroff_in_pm_suspend || !mdwc->in_host_mode) {
-		if (!atomic_read(&dwc->in_lpm)) {
-			dev_err(mdwc->dev, "Abort PM suspend!! (USB is outside LPM)\n");
-			return -EBUSY;
-		}
-
-		atomic_set(&mdwc->pm_suspended, 1);
-
-		return 0;
-	}
+	// 移除未定义字段判断，直接基于 in_host_mode 逻辑处理
+if (!mdwc->in_host_mode) {
+    if (!atomic_read(&dwc->in_lpm)) {
+        dev_err(mdwc->dev, "Abort PM suspend!! (USB is outside LPM)\n");
+        return -EBUSY;
+    }
+    atomic_set(&mdwc->pm_suspended, 1);
+    return 0;
+}
 
 	/*
 	 * PHYs also need to be power collapsed, so call notify_disconnect
@@ -4681,12 +4684,12 @@ static int dwc3_msm_pm_resume(struct device *dev)
 	flush_workqueue(mdwc->dwc3_wq);
 	atomic_set(&mdwc->pm_suspended, 0);
 
-	if (!dwc->host_poweroff_in_pm_suspend || !mdwc->in_host_mode) {
-		/* kick in otg state machine */
-		queue_work(mdwc->dwc3_wq, &mdwc->resume_work);
-
-		return 0;
-	}
+	// 移除未定义字段判断，直接基于 in_host_mode 逻辑处理
+if (!mdwc->in_host_mode) {
+    /* kick in otg state machine */
+    queue_work(mdwc->dwc3_wq, &mdwc->resume_work);
+    return 0;
+}
 
 	/* Resume dwc to avoid unclocked access by xhci_plat_resume */
 	dwc3_msm_resume(mdwc);
