@@ -336,6 +336,31 @@ int fsa4480_switch_event(struct device_node *node,
 	return 0;
 }
 EXPORT_SYMBOL(fsa4480_switch_event);
+int fsa4480_get_direction(struct device_node *node)
+{
+	int switch_status = 0;
+	struct i2c_client *client = of_find_i2c_device_by_node(node);
+	struct fsa4480_priv *fsa_priv;
+
+	if (!client)
+		return -EINVAL;
+
+	fsa_priv = (struct fsa4480_priv *)i2c_get_clientdata(client);
+	if (!fsa_priv)
+		return -EINVAL;
+	if (!fsa_priv->regmap)
+		return -EINVAL;
+
+	regmap_read(fsa_priv->regmap, FSA4480_SWITCH_STATUS0, &switch_status);
+	switch_status >>= 4;
+	switch_status &= 0x3;
+	if (switch_status == 0 || switch_status == 1)
+		return 0;
+	else
+		return 1;
+}
+EXPORT_SYMBOL(fsa4480_get_direction);
+
 
 static void fsa4480_usbc_analog_work_fn(struct work_struct *work)
 {
