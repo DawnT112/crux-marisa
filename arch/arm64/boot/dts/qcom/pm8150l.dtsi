@@ -521,4 +521,53 @@
 			};
 		};
 	};
+
+	/* 添加回被删除的 BCL 温区定义 */
+	pm8150l-bcl-lvl0 {
+		polling-delay-passive = <100>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8150l_bcl 5>;
+		wake-capable-sensor;
+
+		trips {
+			l_bcl_lvl0: l-bcl-lvl0 {
+				temperature = <1>;
+				hysteresis = <1>;
+				type = "passive";
+			};
+		};
+	};
+
+	pm8150l-bcl-lvl1 {
+		polling-delay-passive = <100>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8150l_bcl 6>;
+		wake-capable-sensor;
+
+		trips {
+			l_bcl_lvl1: l-bcl-lvl1 {
+				temperature = <1>;
+				hysteresis = <1>;
+				type = "passive";
+			};
+		};
+	};
+
+	pm8150l-bcl-lvl2 {
+		polling-delay-passive = <100>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8150l_bcl 7>;
+		wake-capable-sensor;
+
+		trips {
+			l_bcl_lvl2: l-bcl-lvl2 {
+				temperature = <1>;
+				hysteresis = <1>;
+				type = "passive";
+			};
+		};
+	};
 };
