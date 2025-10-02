@@ -34,6 +34,7 @@
 
 #include "hub.h"
 #include "otg_whitelist.h"
+#include "hcd.h"
 
 #define USB_VENDOR_GENESYS_LOGIC		0x05e3
 #define HUB_QUIRK_CHECK_PORT_AUTOSUSPEND	0x01
