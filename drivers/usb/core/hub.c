@@ -36,6 +36,16 @@
 #include "hub.h"
 #include "otg_whitelist.h"
 
+#include <linux/uaccess.h>
+#include <asm/byteorder.h>
+
+#include "hub.h"
+#include "otg_whitelist.h"
+
+// 添加这行声明
+#ifdef CONFIG_PM
+extern int usb_set_usb2_hardware_lpm(struct usb_device *udev, int enable);
+#endif
 
 #define USB_VENDOR_GENESYS_LOGIC		0x05e3
 #define HUB_QUIRK_CHECK_PORT_AUTOSUSPEND	0x01
