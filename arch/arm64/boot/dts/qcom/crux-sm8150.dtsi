@@ -317,76 +317,84 @@ And public attribution of xiaomi platforms(like F1X and so and)
 &pm8150b_charger {
 	qcom,cp-mode = <2>;
 	qcom,sec-charger-config = <1>;
-	qcom,usb-icl-ua = <4000000>;
-	qcom,fcc-max-ua = <8000000>;
-	qcom,fv-max-uv = <4480000>;
-	qcom,dc-icl-ua = <500000>;
-	qcom,auto-recharge-vbat-mv = <4380>;
+	qcom,usb-icl-ua = <5000000>;  
+	qcom,fcc-max-ua = <10000000>;
+	qcom,fv-max-uv = <4500000>;   
+	qcom,dc-icl-ua = <4000000>;   
+	qcom,auto-recharge-vbat-mv = <4430>; 
 	qcom,step-charging-enable;
 	qcom,sw-jeita-enable;
 	qcom,chg-term-src = <1>;
-	qcom,chg-term-current-ma = <(-220)>;
-	qcom,chg-term-base-current-ma = <50>;
-	qcom,thermal-mitigation = <3000000 2800000 2600000 2400000 2200000 2100000 2000000
-				   1800000 1600000 1500000 1400000 1200000 1000000 900000
+	qcom,chg-term-current-ma = <(-250)>; 
+	qcom,chg-term-base-current-ma = <100>;
+	
+	qcom,hvdcp-disable = <0>;
+	qcom,hvdcp2-max-icl-ua = <4000000>;  
+	qcom,pd-voltage-max-uv = <11000000>; 
+	qcom,pd-current-max-ua = <4000000>; 
+	qcom,qc3-max-icl-ua = <4000000>;     
+	qcom,otg-cl-ua = <1500000>;
+	
+	qcom,thermal-mitigation = <10000000 9000000 8000000 7000000 6000000 5000000 4500000
+				   4000000 3500000 3000000 2500000 2000000 1500000 1000000
 				   800000 500000>;
 	qcom,thermal-mitigation-icl
-				= <2800000 2700000 2600000 2400000 2400000 2400000 2400000
-				   2400000 2400000 2100000 1900000 1700000 1500000 1300000
-				   1000000 750000>;
+				= <5000000 4500000 4000000 3500000 3000000 2800000 2600000
+				   2400000 2200000 2000000 1800000 1500000 1200000 1000000
+				   800000 500000>;
 	qcom,thermal-mitigation-dcp
-				= <1800000 1800000 1800000 1800000 1800000 1800000 1800000
-				   1800000 1800000 1700000 1600000 1400000 1200000 1100000
-				   1100000 1000000>;
+				= <5000000 4500000 4000000 3500000 3000000 2800000 2600000
+				   2400000 2200000 2000000 1800000 1500000 1200000 1000000
+				   800000 500000>;
 	qcom,thermal-mitigation-qc2
-				= <1500000 1500000 1500000 1500000 1450000 1400000 1350000
-				   1300000 1300000 1200000 1000000 900000 850000 750000
-				   650000 500000>;
+				= <5000000 4500000 4000000 3500000 3000000 2800000 2600000
+				   2400000 2200000 2000000 1800000 1500000 1200000 1000000
+				   800000 500000>;
 	qcom,thermal-fcc-qc3-normal
-				= <3200000 3000000 2800000 2600000 2500000 2400000 2300000
-				   2200000 2100000 1800000 1600000 1400000 1200000 1000000
-				   750000 750000>;
+				= <10000000 9000000 8000000 7000000 6000000 5500000 5000000
+				   4500000 4000000 3500000 3000000 2500000 2000000 1500000
+				   1000000 500000>;
 	qcom,thermal-fcc-qc3-cp
-				= <3600000 3600000 3600000 3600000 3200000 3200000 3200000
-				   3200000 3100000 2800000 2400000 2200000 2000000 1300000
-				   750000 700000>;
+				= <10000000 9000000 8000000 7000000 6000000 5500000 5000000
+				   4500000 4000000 3500000 3000000 2500000 2000000 1500000
+				   1000000 500000>;
 	qcom,thermal-fcc-qc3-classb-cp
-				= <4800000 4700000 4600000 4500000 4400000 4200000 4200000
-				   4200000 4000000 3600000 3400000 3200000 3000000 2200000
-				   1000000 700000>;
+				= <10000000 9000000 8000000 7000000 6000000 5500000 5000000
+				   4500000 4000000 3500000 3000000 2500000 2000000 1500000
+				   1000000 500000>;
 	qcom,thermal-mitigation-pd-base
-				= <4000000 3600000 3200000 2800000 2800000 2800000 2800000
-				   2800000 2800000 2400000 2400000 2000000 1600000 1300000
+				= <10000000 9000000 8000000 7000000 6000000 5500000 5000000
+				   4500000 4000000 3500000 3000000 2500000 2000000 1500000
 				   1000000 500000>;
 	qcom,thermal-fcc-pps-cp
-				= <8000000 7500000 7000000 6500000 6000000 5500000 5350000
-				   4500000 4000000 3500000 3000000 3000000 3000000 2000000
-				   1500000 100000>;
+				= <10000000 9000000 8000000 7000000 6000000 5500000 5000000
+				   4500000 4000000 3500000 3000000 2500000 2000000 1500000
+				   1000000 500000>;
 	qcom,thermal-mitigation-dc
-				= <3100000 2200000 1800000 1600000 1400000 1200000 1100000
-				   1000000 900000  800000  700000  600000  500000  400000
-				   300000  200000>;
+				= <4000000 3800000 3600000 3400000 3200000 3000000 2800000
+				   2600000 2400000 2200000 2000000 1800000 1600000 1400000
+				   1200000 1000000>;
 	qcom,thermal-mitigation-epp
-				= <1200000 1200000 1200000 1100000 1100000 1000000 1000000
-				   1000000 900000  700000  700000  600000  500000  400000
-				   300000  200000>;
+				= <4000000 3800000 3600000 3400000 3200000 3000000 2800000
+				   2600000 2400000 2200000 2000000 1800000 1600000 1400000
+				   1200000 1000000>;
 	qcom,thermal-mitigation-bpp-qc3
-				= <1400000 1300000 1200000 1200000 1100000 1000000 900000
-				   800000  700000  700000  700000  600000  500000  400000
-				   300000  200000>;
+				= <3000000 2800000 2600000 2400000 2200000 2000000 1800000
+				   1600000 1400000 1200000 1000000 800000 600000 400000
+				   200000 100000>;
 	qcom,thermal-mitigation-bpp-qc2
-				= <1100000 1100000 1100000 1100000 1100000 1000000 1000000
-				   1000000 700000  700000  700000  600000  500000  400000
-				   300000  200000>;
+				= <2500000 2300000 2100000 1900000 1700000 1500000 1300000
+				   1100000 900000 700000 500000 300000 200000 100000
+				   50000 30000>;
 	qcom,thermal-mitigation-bpp
-				= <700000 700000 700000 700000 700000 700000 700000
-				   700000 700000  600000  600000  500000  400000 300000
-				   200000  200000>;
+				= <2000000 1800000 1600000 1400000 1200000 1000000 800000
+				   600000 400000 300000 200000 100000 50000 30000
+				   20000 10000>;
 	qcom,thermal-mitigation-dc-20w
-				= <2200000 1400000 1300000 1200000 700000 600000 500000
-				   400000 400000  400000  400000  400000  400000  400000
-				   400000  400000>;
-	qcom,thermal-mitigation-voice = <0x5b8d80 0x2191c0 0x2191c0 0xf4240 0xf4240 0xc3500 0xc3500 0xc3500 0xc3500 0xaae60 0xaae60 0x927c0 0x927c0 0x927c0 0x7a120 0x61a80>;
+				= <4000000 3800000 3600000 3400000 3200000 3000000 2800000
+				   2600000 2400000 2200000 2000000 1800000 1600000 1400000
+				   1200000 1000000>;
+	qcom,thermal-mitigation-voice = <0x7a1200 0x6acfc0 0x5b8d80 0x4c4b40 0x3d0900 0x2dc6c0 0x1e8480 0xf4240 0xc3500 0xaae60 0x927c0 0x7a120 0x61a80 0x493e0 0x30d40 0x186a0>;
 
 	io-channels = <&pm8150b_vadc ADC_MID_CHG_DIV6>,
 		      <&pm8150b_vadc ADC_USB_IN_V_16>,
@@ -412,6 +420,15 @@ And public attribution of xiaomi platforms(like F1X and so and)
 	qcom,support-conn-therm;
 	qcom,support-ext-fg;
 
+	qcom,hvdcp-supported;
+	qcom,pd-supported;
+	qcom,qc3-supported;
+	qcom,usb-pd-protocol = "pdo";
+	qcom,typec-port = "dual";
+	
+	qcom,dynamic-wireless-current-supported;
+	qcom,wipower-max-uw = <5000000>;
+	
 	vbus-disable-gpio = <&pm8150_gpios 10 GPIO_ACTIVE_HIGH>;
 
 	pinctrl-names = "default";
@@ -419,49 +436,88 @@ And public attribution of xiaomi platforms(like F1X and so and)
 };
 
 &smb1390 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&smb_stat_default>;
-	status = "ok";
+    pinctrl-names = "default";
+    pinctrl-0 = <&smb_stat_default>;
+    status = "ok";
+    
+    qcom,parallel-input-mode = <1>;   
+    qcom,parallel-output-mode = <2>;   
+    qcom,min-icl-ua = <1000000>;       
+    qcom,max-icl-ua = <5000000>;       
+    qcom,parallel-charger-current = <5000000>; 
 };
 
 &smb1390_charger {
-	io-channels = <&pm8150b_vadc ADC_AMUX_THM2>;
-	io-channel-names = "smb1390_therm";
-	qcom,parallel-output-mode = <2>;
-	status = "ok";
+    io-channels = <&pm8150b_vadc ADC_AMUX_THM2>;
+    io-channel-names = "smb1390_therm";
+    qcom,parallel-output-mode = <2>;
+    qcom,parallel-charging-enabled;   
+    qcom,parallel-main-chg-fcc = <5000000>; 
+    qcom,parallel-main-chg-icl = <5000000>; 
+    status = "ok";
 };
 
 &smb1390_slave {
-	status = "ok";
+    status = "ok";  
+ 
+    qcom,parallel-input-mode = <1>;
+    qcom,parallel-output-mode = <2>;
+    qcom,min-icl-ua = <1000000>;
+    qcom,max-icl-ua = <3000000>;
 };
 
 &smb1390_slave_charger {
-	status = "ok";
+    status = "ok";
+    
+    qcom,thermal-mitigation = <3000000 2800000 2600000 2400000 2200000 
+                             2000000 1800000 1600000 1400000 1200000 
+                             1000000 800000 600000 400000 200000>;
 };
 
-
-
 &ext_5v_boost {
-	status = "ok";
+    status = "ok";
 };
 
 &pm8150b_pdphy {
-	vbus-supply = <&ext_5v_boost>;
-	mi,pd_curr_limit = <1>;
-	mi,pd_max_curr_limit = <4000000>;
-};
-
-&usb0 {
-	dwc3@a600000 {
-		usb-phy = <&usb2_phy0>, <&usb_nop_phy>;
-		maximum-speed = "high-speed";
-	};
+    vbus-supply = <&ext_5v_boost>;
+    mi,pd_curr_limit = <1>;
+    mi,pd_max_curr_limit = <5000000>;  
+    
+    qcom,default-sink-caps = <5000 4000>,   /* 5V @ 4A = 20W */
+                            <9000 3000>,   /* 9V @ 3A = 27W */
+                            <10000 4000>,  /* 10V @ 4A = 40W */
+                            <11000 4000>;  /* 11V @ 4A = 44W */
+    
+    qcom,default-src-caps = <5000 3000>,   /* 5V @ 3A */
+                           <9000 3000>,   /* 9V @ 3A */
+                           <10000 4000>,  /* 10V @ 4A */
+                           <11000 4000>;  /* 11V @ 4A */
+    
+    qcom,pd-volt-max = <11000000>;
+    qcom,pd-curr-max = <5000000>;
+    qcom,pps-volt-max = <11000000>;
+    qcom,pps-curr-max = <5000000>;
 };
 
 &usb2_phy0 {
-	qcom,param-override-seq =
-		<0x33 0x70
-		 0x2c 0x74>;
+    status = "okay";
+    qcom,param-override-seq = 
+        <0x67 0x6c 
+         0x0c 0x70  
+         0x04 0x74
+         0x00 0x78>; 
+};
+
+&mtp_batterydata {
+    qcom,batt-id-range-pct = <15>;
+    qcom,fastchg-current-ma = <10000>; 
+    qcom,fg-cc-cv-threshold-mv = <4430>;
+    
+    qcom,step-chg-steps = <4200000 10000000
+                          4300000 8000000
+                          4400000 6000000
+                          4450000 4000000
+                          4480000 2000000>;
 };
 
 &usb_qmp_dp_phy {
