@@ -41,6 +41,9 @@
 #include "pinctrl-msm.h"
 #include "../pinctrl-utils.h"
 #include <linux/suspend.h>
+#include <soc/qcom/socinfo.h>
+#include <linux/of.h>
+#include <linux/of_device.h>
 #ifdef CONFIG_HIBERNATION
 #include <linux/notifier.h>
 #endif
