@@ -9,7 +9,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-
+#define DEBUG
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/power_supply.h>
@@ -22,6 +22,7 @@
 
 #define FSA4480_SWITCH_SETTINGS 0x04
 #define FSA4480_SWITCH_CONTROL  0x05
+#define FSA4480_SWITCH_STATUS0  0x06
 #define FSA4480_SWITCH_STATUS1  0x07
 #define FSA4480_SLOW_L          0x08
 #define FSA4480_SLOW_R          0x09
